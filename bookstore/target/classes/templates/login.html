@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="auth-page">
+
+<div class="auth-split">
+  <!-- LEFT PANEL -->
+  <div class="auth-hero">
+    <div class="hero-content">
+      <div class="hero-brand">📚 BookVault</div>
+      <h1 class="hero-title">Your world of books, reimagined.</h1>
+      <p class="hero-sub">Discover, collect, and enjoy thousands of titles curated just for you.</p>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">30+</span><span class="stat-label">Books</span></div>
+        <div class="stat"><span class="stat-num">6</span><span class="stat-label">Categories</span></div>
+        <div class="stat"><span class="stat-num">3</span><span class="stat-label">Payment Methods</span></div>
+      </div>
+    </div>
+    <div class="hero-books-decor">
+      <div class="book-spine" style="--c:#e07b39;--h:140px;--d:0s">Fiction</div>
+      <div class="book-spine" style="--c:#5b7fa6;--h:180px;--d:.1s">Tech</div>
+      <div class="book-spine" style="--c:#7c5cbf;--h:120px;--d:.2s">Science</div>
+      <div class="book-spine" style="--c:#3a9e6e;--h:160px;--d:.3s">Life</div>
+      <div class="book-spine" style="--c:#c4405a;--h:100px;--d:.4s">Kids</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <h2 class="auth-heading">Welcome back</h2>
+      <p class="auth-sub">Sign in to your account</p>
+
+      <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+      <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+      <form th:action="@{/login}" method="post" class="auth-form">
+        <div class="form-group">
+          <label>User ID</label>
+          <input type="text" name="username" placeholder="Enter your user ID" required autocomplete="username"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password"/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+      <a th:href="@{/register}" class="btn btn-outline btn-full">Create Account</a>
+
+      <div class="auth-demo">
+        <p class="demo-label">Demo credentials</p>
+        <div class="demo-creds">
+          <span><strong>Admin:</strong> admin / admin</span>
+          <span><strong>Customer:</strong> cust1 / pass</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

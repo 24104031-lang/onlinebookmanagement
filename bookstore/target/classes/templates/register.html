@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="auth-page">
+
+<div class="auth-split">
+  <div class="auth-hero">
+    <div class="hero-content">
+      <div class="hero-brand">📚 BookVault</div>
+      <h1 class="hero-title">Join the community of book lovers.</h1>
+      <p class="hero-sub">Get access to thousands of books, wishlists, orders and more.</p>
+    </div>
+    <div class="hero-books-decor">
+      <div class="book-spine" style="--c:#e07b39;--h:160px;--d:0s">Novel</div>
+      <div class="book-spine" style="--c:#5b7fa6;--h:130px;--d:.15s">Learn</div>
+      <div class="book-spine" style="--c:#7c5cbf;--h:190px;--d:.3s">Grow</div>
+    </div>
+  </div>
+
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <h2 class="auth-heading">Create Account</h2>
+      <p class="auth-sub">It's free and takes 30 seconds</p>
+
+      <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+      <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+      <form th:action="@{/register}" method="post" class="auth-form">
+        <div class="form-group">
+          <label>User ID</label>
+          <input type="text" name="userId" placeholder="Choose a unique ID" required/>
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="Your full name" required/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Choose a password" required/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+
+      <div class="auth-divider"><span>Already have an account?</span></div>
+      <a th:href="@{/login}" class="btn btn-outline btn-full">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

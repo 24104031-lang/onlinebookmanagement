@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>All Orders — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">All Orders</h1>
+    <p class="page-sub" th:text="${orders.size()} + ' orders total'"></p>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+  <div th:each="order : ${orders}" class="order-card admin-order">
+    <div class="order-head">
+      <div class="order-meta">
+        <span class="order-id mono" th:text="${order.orderId}"></span>
+        <span class="badge"
+              th:classappend="${order.status == 'Completed' ? ' badge-green' : order.status == 'Pending' ? ' badge-yellow' : ' badge-red'}"
+              th:text="${order.status}"></span>
+      </div>
+      <div class="order-info-row">
+        <span>👤 <strong th:text="${order.customerName != null ? order.customerName : order.customerId}"></strong></span>
+        <span>💳 <span th:text="${order.paymentMethod}"></span></span>
+        <span>📅 <span th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd MMM yyyy HH:mm') : 'N/A'}"></span></span>
+        <span class="order-total">$<span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}"></span></span>
+      </div>
+    </div>
+
+    <div class="order-items-list">
+      <div th:each="item : ${order.items}" class="order-item-row">
+        <span th:text="${item.bookTitle}"></span>
+        <span>× <span th:text="${item.quantity}"></span></span>
+        <span th:text="'$' + #numbers.formatDecimal(item.priceAtPurchase, 1, 2)"></span>
+      </div>
+    </div>
+
+    <div class="order-actions">
+      <form th:action="@{/admin/orders/status/{id}(id=${order.orderId})}" method="post" class="inline-form">
+        <select name="status" class="select-sm">
+          <option value="Pending" th:selected="${order.status == 'Pending'}">Pending</option>
+          <option value="Processing" th:selected="${order.status == 'Processing'}">Processing</option>
+          <option value="Shipped" th:selected="${order.status == 'Shipped'}">Shipped</option>
+          <option value="Delivered" th:selected="${order.status == 'Delivered'}">Delivered</option>
+          <option value="Completed" th:selected="${order.status == 'Completed'}">Completed</option>
+          <option value="Cancelled" th:selected="${order.status == 'Cancelled'}">Cancelled</option>
+        </select>
+        <button type="submit" class="btn btn-sm btn-outline">Update Status</button>
+      </form>
+    </div>
+  </div>
+
+  <div th:if="${orders.empty}" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <p>No orders yet.</p>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Wishlist — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">My Wishlist</h1>
+    <p class="page-sub" th:text="${wishlistBooks.size()} + ' saved book(s)'"></p>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+  <div th:if="${!#lists.isEmpty(wishlistBooks)}" class="book-grid">
+    <div th:each="book : ${wishlistBooks}" class="book-card">
+      <a th:href="@{/customer/books/{id}(id=${book.bookId})}" class="book-card-link">
+        <div class="book-cover"
+             th:style="'background: linear-gradient(135deg,' + (book.ebook ? '#1a3a5c,#2d6aa0' : '#2c1810,#8b4513') + ')'">
+          <div class="book-cover-text">
+            <span class="cover-title" th:text="${book.title}"></span>
+            <span class="cover-author" th:text="${book.author}"></span>
+          </div>
+        </div>
+        <div class="book-info">
+          <div class="book-category" th:text="${book.category}"></div>
+          <div class="book-title" th:text="${book.title}"></div>
+          <div class="book-author" th:text="${book.author}"></div>
+          <div class="book-price" th:text="'$' + #numbers.formatDecimal(book.price, 1, 2)"></div>
+          <div th:unless="${book.ebook}" class="stock-info"
+               th:classappend="${book.stock > 0 ? ' in-stock' : ' out-stock'}"
+               th:text="${book.stock > 0 ? book.stock + ' in stock' : 'Out of Stock'}"></div>
+        </div>
+      </a>
+      <div class="book-actions">
+        <form th:action="@{/cart/add}" method="post">
+          <input type="hidden" name="bookId" th:value="${book.bookId}"/>
+          <input type="hidden" name="quantity" value="1"/>
+          <button type="submit" class="btn btn-sm btn-primary btn-full"
+                  th:disabled="${!book.ebook and book.stock == 0}">
+            🛒 Add to Cart
+          </button>
+        </form>
+        <form th:action="@{/wishlist/remove/{id}(id=${book.bookId})}" method="post">
+          <button type="submit" class="btn btn-sm btn-ghost btn-full">♥ Remove</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${#lists.isEmpty(wishlistBooks)}" class="empty-state">
+    <div class="empty-icon">♡</div>
+    <p>Your wishlist is empty.</p>
+    <a th:href="@{/customer/books}" class="btn btn-primary">Discover Books</a>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

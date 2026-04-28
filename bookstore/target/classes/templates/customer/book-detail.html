@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title th:text="${book.title} + ' — BookVault'">Book Detail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+
+<div class="page-wrap">
+  <a th:href="@{/customer/books}" class="back-link">← Back to Browse</a>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div th:if="${book != null}" class="book-detail-layout">
+    <!-- Left: cover -->
+    <div class="detail-cover-wrap">
+      <div class="detail-cover"
+           th:style="'background: linear-gradient(135deg,' + (book.ebook ? '#1a3a5c, #2d6aa0' : '#2c1810, #8b4513') + ')'">
+        <div class="detail-cover-text">
+          <span class="dc-title" th:text="${book.title}"></span>
+          <span class="dc-author" th:text="${book.author}"></span>
+        </div>
+      </div>
+      <div class="detail-badges">
+        <span class="badge badge-blue" th:text="${book.category}"></span>
+        <span th:if="${book.ebook}" class="badge badge-green">E-Book</span>
+        <span th:unless="${book.ebook}" class="badge"
+              th:classappend="${book.stock > 0 ? ' badge-green' : ' badge-red'}"
+              th:text="${book.stock > 0 ? book.stock + ' in stock' : 'Out of Stock'}"></span>
+      </div>
+    </div>
+
+    <!-- Right: details -->
+    <div class="detail-info">
+      <div class="detail-category" th:text="${book.category}"></div>
+      <h1 class="detail-title" th:text="${book.title}"></h1>
+      <p class="detail-author">by <span th:text="${book.author}"></span></p>
+
+      <div class="detail-rating" th:if="${avgRating != null}">
+        <span class="stars-display" th:data-rating="${avgRating}">
+          <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+            <span th:text="${i <= avgRating ? '★' : '☆'}"
+                  th:classappend="${i <= avgRating ? ' star-filled' : ' star-empty'}"></span>
+          </th:block>
+        </span>
+        <span class="rating-count" th:text="${avgRating} + ' / 5 (' + ${reviews.size()} + ' reviews)'"></span>
+      </div>
+      <div class="detail-rating" th:if="${avgRating == null}">
+        <span class="no-reviews">No reviews yet</span>
+      </div>
+
+      <div class="detail-price" th:text="'$' + #numbers.formatDecimal(book.price, 1, 2)"></div>
+      <div class="detail-id">Book ID: <span class="mono" th:text="${book.bookId}"></span></div>
+
+      <!-- Add to cart -->
+      <div class="detail-actions">
+        <form th:action="@{/cart/add}" method="post" class="add-detail-form">
+          <input type="hidden" name="bookId" th:value="${book.bookId}"/>
+          <div class="qty-row" th:unless="${!book.ebook and book.stock == 0}">
+            <label>Qty:</label>
+            <input type="number" name="quantity" value="1" min="1"
+                   th:max="${book.ebook ? 99 : book.stock}" class="qty-input"/>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg"
+                  th:disabled="${!book.ebook and book.stock == 0}">
+            <span th:if="${!book.ebook and book.stock == 0}">Out of Stock</span>
+            <span th:unless="${!book.ebook and book.stock == 0}">🛒 Add to Cart</span>
+          </button>
+        </form>
+
+        <!-- Wishlist -->
+        <form th:if="${!inWishlist}" th:action="@{/wishlist/add/{id}(id=${book.bookId})}" method="post">
+          <button type="submit" class="btn btn-outline">♡ Add to Wishlist</button>
+        </form>
+        <form th:if="${inWishlist}" th:action="@{/wishlist/remove/{id}(id=${book.bookId})}" method="post">
+          <button type="submit" class="btn btn-ghost">♥ In Wishlist</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="reviews-section" th:if="${book != null}">
+    <h2 class="section-title">Reviews</h2>
+
+    <!-- Submit review -->
+    <div class="review-form-card">
+      <h3>Leave a Review</h3>
+      <form th:action="@{/review/add}" method="post" class="review-form">
+        <input type="hidden" name="bookId" th:value="${book.bookId}"/>
+        <div class="star-picker" id="starPicker">
+          <span th:each="i : ${#numbers.sequence(1, 5)}" class="star-pick" th:data-val="${i}">☆</span>
+        </div>
+        <input type="hidden" name="rating" id="ratingInput" value="5"/>
+        <textarea name="comment" placeholder="Share your thoughts about this book..." rows="3" class="review-textarea"></textarea>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    </div>
+
+    <!-- Existing reviews -->
+    <div class="reviews-list">
+      <div th:each="review : ${reviews}" class="review-card">
+        <div class="review-header">
+          <div>
+            <div class="review-customer" th:text="${review.customerName}"></div>
+            <div class="review-date" th:text="${review.createdAt != null ? #temporals.format(review.createdAt, 'dd MMM yyyy') : ''}"></div>
+          </div>
+          <div class="stars">
+            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                  th:text="${i <= review.rating ? '★' : '☆'}"
+                  th:classappend="${i <= review.rating ? ' star-filled' : ' star-empty'}"></span>
+          </div>
+        </div>
+        <p class="review-comment" th:text="${review.comment}"></p>
+      </div>
+      <div th:if="${reviews.empty}" class="no-reviews-msg">No reviews yet. Be the first!</div>
+    </div>
+  </div>
+
+  <div th:if="${book == null}" class="empty-state">
+    <div class="empty-icon">📚</div>
+    <p>Book not found.</p>
+    <a th:href="@{/customer/books}" class="btn btn-outline">Back to Browse</a>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

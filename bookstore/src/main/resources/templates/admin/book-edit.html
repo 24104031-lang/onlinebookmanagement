@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Edit Book — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">Edit Book</h1>
+    <span class="badge badge-blue" th:text="${book.bookId}"></span>
+  </div>
+
+  <div class="form-card">
+    <form th:action="@{/admin/books/edit/{id}(id=${book.bookId})}" method="post" class="book-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" name="title" th:value="${book.title}" required/>
+        </div>
+        <div class="form-group">
+          <label>Author</label>
+          <input type="text" name="author" th:value="${book.author}" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Price ($)</label>
+          <input type="number" name="price" step="0.01" min="0" th:value="${book.price}" required/>
+        </div>
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" name="stock" min="0" th:value="${book.stock}" required/>
+        </div>
+      </div>
+      <div class="form-group form-group-check">
+        <label class="check-label">
+          <input type="checkbox" name="ebook" th:checked="${book.ebook}"/>
+          <span>E-Book (unlimited stock)</span>
+        </label>
+      </div>
+      <div class="form-actions">
+        <a th:href="@{/admin/books}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

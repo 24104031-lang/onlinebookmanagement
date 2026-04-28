@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${pageTitle != null ? pageTitle + ' — BookVault' : 'BookVault'}">BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+  <th:block th:fragment="head-extra"></th:block>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar" th:fragment="navbar">
+  <div class="nav-inner">
+    <a class="nav-brand" th:href="@{/dashboard}">
+      <span class="brand-icon">📚</span>
+      <span>BookVault</span>
+    </a>
+
+    <div class="nav-links">
+      <!-- CUSTOMER LINKS -->
+      <th:block sec:authorize="hasRole('CUSTOMER')">
+        <a th:href="@{/customer/books}" class="nav-link">Browse</a>
+        <a th:href="@{/cart}" class="nav-link">
+          Cart
+          <span class="cart-badge" id="cartBadge" style="display:none"></span>
+        </a>
+        <a th:href="@{/wishlist}" class="nav-link">Wishlist</a>
+        <a th:href="@{/orders}" class="nav-link">My Orders</a>
+      </th:block>
+
+      <!-- ADMIN LINKS -->
+      <th:block sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/dashboard}" class="nav-link">Dashboard</a>
+        <a th:href="@{/admin/books}" class="nav-link">Books</a>
+        <a th:href="@{/admin/orders}" class="nav-link">Orders</a>
+        <a th:href="@{/admin/reviews}" class="nav-link">Reviews</a>
+        <a th:href="@{/admin/users}" class="nav-link">Users</a>
+      </th:block>
+    </div>
+
+    <div class="nav-actions">
+      <span class="nav-user" sec:authentication="name"></span>
+      <form th:action="@{/logout}" method="post" style="display:inline">
+        <button type="submit" class="btn-logout">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<th:block th:fragment="scripts-end">
+  <script th:src="@{/js/main.js}"></script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Cart — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">Your Cart</h1>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div th:if="${!#lists.isEmpty(cartItems)}" class="cart-layout">
+    <div class="cart-items">
+      <div th:each="item : ${cartItems}" class="cart-row">
+        <div class="cart-book-info">
+          <div class="cart-book-cover" th:style="'background: linear-gradient(135deg,' + (item.ebook ? '#1a3a5c,#2d6aa0' : '#2c1810,#8b4513') + ')'">
+            <span th:text="${item.title.substring(0, [#lists.size({item.title}) > 2 ? 2 : 1].get(0))}">B</span>
+          </div>
+          <div>
+            <div class="cart-title" th:text="${item.title}"></div>
+            <div class="cart-author" th:text="${item.author}"></div>
+            <div class="cart-price" th:text="'$' + #numbers.formatDecimal(item.price, 1, 2) + ' each'"></div>
+          </div>
+        </div>
+
+        <div class="cart-qty-actions">
+          <form th:action="@{/cart/update/{id}(id=${item.bookId})}" method="post" class="qty-form">
+            <input type="number" name="quantity" th:value="${item.quantity}" min="1" max="99" class="qty-input-sm"/>
+            <button type="submit" class="btn btn-sm btn-ghost">Update</button>
+          </form>
+          <form th:action="@{/cart/remove/{id}(id=${item.bookId})}" method="post">
+            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+          </form>
+        </div>
+
+        <div class="cart-subtotal" th:text="'$' + #numbers.formatDecimal(item.subtotal, 1, 2)"></div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="cart-summary">
+      <h2>Order Summary</h2>
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span th:text="'$' + #numbers.formatDecimal(cartTotal, 1, 2)"></span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery</span>
+        <span class="text-green">Free</span>
+      </div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span th:text="'$' + #numbers.formatDecimal(cartTotal, 1, 2)"></span>
+      </div>
+      <a th:href="@{/cart/checkout}" class="btn btn-primary btn-full btn-lg">Proceed to Checkout →</a>
+      <a th:href="@{/customer/books}" class="btn btn-ghost btn-full" style="margin-top:.5rem;">Continue Shopping</a>
+    </div>
+  </div>
+
+  <div th:if="${#lists.isEmpty(cartItems)}" class="empty-state">
+    <div class="empty-icon">🛒</div>
+    <p>Your cart is empty.</p>
+    <a th:href="@{/customer/books}" class="btn btn-primary">Browse Books</a>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

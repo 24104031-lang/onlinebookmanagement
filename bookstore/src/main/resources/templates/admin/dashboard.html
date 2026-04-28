@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-sub">Overview of your BookVault store</p>
+  </div>
+
+  <!-- Flash messages -->
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-info">
+        <div class="stat-value" th:text="${totalBooks}">0</div>
+        <div class="stat-name">Total Books</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🛒</div>
+      <div class="stat-info">
+        <div class="stat-value" th:text="${totalOrders}">0</div>
+        <div class="stat-name">Total Orders</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <div class="stat-value" th:text="${totalUsers}">0</div>
+        <div class="stat-name">Registered Users</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏷️</div>
+      <div class="stat-info">
+        <div class="stat-value" th:text="${categories.size()}">0</div>
+        <div class="stat-name">Categories</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-header">
+    <h2>Quick Actions</h2>
+  </div>
+  <div class="quick-actions">
+    <a th:href="@{/admin/books/add}" class="action-card">
+      <span class="action-icon">➕</span>
+      <span>Add New Book</span>
+    </a>
+    <a th:href="@{/admin/books}" class="action-card">
+      <span class="action-icon">📖</span>
+      <span>Manage Books</span>
+    </a>
+    <a th:href="@{/admin/orders}" class="action-card">
+      <span class="action-icon">📦</span>
+      <span>View Orders</span>
+    </a>
+    <a th:href="@{/admin/reviews}" class="action-card">
+      <span class="action-icon">⭐</span>
+      <span>View Reviews</span>
+    </a>
+    <a th:href="@{/admin/users}" class="action-card">
+      <span class="action-icon">👤</span>
+      <span>View Users</span>
+    </a>
+  </div>
+
+  <!-- RECENT ORDERS -->
+  <div class="section-header">
+    <h2>Recent Orders</h2>
+    <a th:href="@{/admin/orders}" class="link-more">View All →</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Amount</th>
+          <th>Payment</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="order : ${recentOrders}">
+          <td class="mono" th:text="${order.orderId}"></td>
+          <td th:text="${order.customerName != null ? order.customerName : order.customerId}"></td>
+          <td th:text="'$' + #numbers.formatDecimal(order.totalAmount, 1, 2)"></td>
+          <td th:text="${order.paymentMethod}"></td>
+          <td>
+            <span class="badge"
+                  th:classappend="${order.status == 'Completed' ? ' badge-green' : order.status == 'Pending' ? ' badge-yellow' : ' badge-red'}"
+                  th:text="${order.status}"></span>
+          </td>
+          <td th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy')}"></td>
+        </tr>
+        <tr th:if="${recentOrders.empty}">
+          <td colspan="6" class="empty-row">No orders yet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

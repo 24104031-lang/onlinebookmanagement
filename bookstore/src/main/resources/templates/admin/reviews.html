@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Reviews — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">All Reviews</h1>
+    <p class="page-sub" th:text="${reviews.size()} + ' reviews'"></p>
+  </div>
+
+  <div class="reviews-grid">
+    <div th:each="review : ${reviews}" class="review-card">
+      <div class="review-header">
+        <div>
+          <div class="review-book" th:text="${review.bookTitle}"></div>
+          <div class="review-customer">by <span th:text="${review.customerName}"></span></div>
+        </div>
+        <div class="stars" th:data-rating="${review.rating}">
+          <span th:each="i : ${#numbers.sequence(1, 5)}"
+                th:text="${i <= review.rating ? '★' : '☆'}"
+                th:classappend="${i <= review.rating ? ' star-filled' : ' star-empty'}"></span>
+        </div>
+      </div>
+      <p class="review-comment" th:text="${review.comment}"></p>
+      <div class="review-date" th:text="${review.createdAt != null ? #temporals.format(review.createdAt, 'dd MMM yyyy') : ''}"></div>
+    </div>
+  </div>
+
+  <div th:if="${reviews.empty}" class="empty-state">
+    <div class="empty-icon">⭐</div>
+    <p>No reviews yet.</p>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

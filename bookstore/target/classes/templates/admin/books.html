@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Books — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Manage Books</h1>
+      <p class="page-sub" th:text="${books.size()} + ' books in inventory'"></p>
+    </div>
+    <a th:href="@{/admin/books/add}" class="btn btn-primary">+ Add Book</a>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <!-- Search & Filter -->
+  <div class="filter-bar">
+    <form th:action="@{/admin/books}" method="get" class="search-form">
+      <input type="text" name="search" placeholder="Search by title, author..."
+             th:value="${search}" class="search-input"/>
+      <button type="submit" class="btn btn-sm btn-outline">Search</button>
+    </form>
+    <div class="category-pills">
+      <a th:href="@{/admin/books}" class="pill" th:classappend="${selectedCategory == null and search == null ? ' active' : ''}">All</a>
+      <a th:each="cat : ${categories}"
+         th:href="@{/admin/books(category=${cat})}"
+         class="pill"
+         th:classappend="${selectedCategory == cat ? ' active' : ''}"
+         th:text="${cat}"></a>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="book : ${books}">
+          <td class="mono" th:text="${book.bookId}"></td>
+          <td th:text="${book.title}"></td>
+          <td th:text="${book.author}"></td>
+          <td><span class="badge badge-blue" th:text="${book.category}"></span></td>
+          <td th:text="'$' + #numbers.formatDecimal(book.price, 1, 2)"></td>
+          <td>
+            <span th:if="${book.ebook}" class="badge badge-green">Unlimited</span>
+            <span th:unless="${book.ebook}"
+                  th:text="${book.stock}"
+                  th:classappend="${book.stock < 5 ? ' stock-low' : ''}"></span>
+          </td>
+          <td>
+            <span th:text="${book.ebook ? 'E-Book' : 'Physical'}" class="type-tag"></span>
+          </td>
+          <td class="actions-cell">
+            <a th:href="@{/admin/books/edit/{id}(id=${book.bookId})}" class="btn btn-sm btn-outline">Edit</a>
+            <form th:action="@{/admin/books/delete/{id}(id=${book.bookId})}" method="post" style="display:inline"
+                  onsubmit="return confirm('Delete this book?')">
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+            <!-- Quick stock update -->
+            <form th:action="@{/admin/books/stock/{id}(id=${book.bookId})}" method="post" class="inline-form">
+              <input type="number" name="stock" th:value="${book.stock}" min="0" class="stock-input"/>
+              <button type="submit" class="btn btn-sm btn-ghost">Update</button>
+            </form>
+          </td>
+        </tr>
+        <tr th:if="${books.empty}">
+          <td colspan="8" class="empty-row">No books found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Books — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Browse Books</h1>
+      <p class="page-sub" th:text="${books.size()} + ' books available'"></p>
+    </div>
+  </div>
+
+  <!-- Flash messages -->
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <!-- Search & Filter -->
+  <div class="filter-bar">
+    <form th:action="@{/customer/books}" method="get" class="search-form">
+      <input type="text" name="search" placeholder="Search books, authors..."
+             th:value="${search}" class="search-input"/>
+      <button type="submit" class="btn btn-sm btn-primary">🔍 Search</button>
+      <a th:if="${search != null or selectedCategory != null}" th:href="@{/customer/books}" class="btn btn-sm btn-ghost">Clear</a>
+    </form>
+    <div class="category-pills">
+      <a th:href="@{/customer/books}" class="pill" th:classappend="${selectedCategory == null and search == null ? ' active' : ''}">All</a>
+      <a th:each="cat : ${categories}"
+         th:href="@{/customer/books(category=${cat})}"
+         class="pill"
+         th:classappend="${selectedCategory == cat ? ' active' : ''}"
+         th:text="${cat}"></a>
+    </div>
+  </div>
+
+  <!-- Book Grid -->
+  <div class="book-grid">
+    <div th:each="book : ${books}" class="book-card" th:data-category="${book.category}">
+      <a th:href="@{/customer/books/{id}(id=${book.bookId})}" class="book-card-link">
+        <div class="book-cover" th:style="'background: linear-gradient(135deg, ' + (book.ebook ? '#1a3a5c, #2d6aa0' : '#2c1810, #8b4513') + ')'">
+          <div class="book-cover-text">
+            <span class="cover-title" th:text="${book.title}"></span>
+            <span class="cover-author" th:text="${book.author}"></span>
+          </div>
+          <div class="cover-badge-wrap">
+            <span th:if="${book.ebook}" class="cover-badge ebook-badge">E-Book</span>
+            <span th:unless="${book.ebook or book.stock > 0}" class="cover-badge oos-badge">Out of Stock</span>
+          </div>
+        </div>
+        <div class="book-info">
+          <div class="book-category" th:text="${book.category}"></div>
+          <div class="book-title" th:text="${book.title}"></div>
+          <div class="book-author" th:text="${book.author}"></div>
+          <div class="book-price" th:text="'$' + #numbers.formatDecimal(book.price, 1, 2)"></div>
+        </div>
+      </a>
+
+      <div class="book-actions">
+        <form th:action="@{/cart/add}" method="post" class="add-cart-form">
+          <input type="hidden" name="bookId" th:value="${book.bookId}"/>
+          <input type="hidden" name="quantity" value="1"/>
+          <button type="submit" class="btn btn-sm btn-primary btn-full"
+                  th:disabled="${!book.ebook and book.stock == 0}">
+            <span th:if="${!book.ebook and book.stock == 0}">Out of Stock</span>
+            <span th:unless="${!book.ebook and book.stock == 0}">🛒 Add to Cart</span>
+          </button>
+        </form>
+        <form th:action="@{/wishlist/add/{id}(id=${book.bookId})}" method="post">
+          <button type="submit" class="btn btn-sm btn-ghost"
+                  th:classappend="${wishlistIds.contains(book.bookId) ? ' wishlisted' : ''}"
+                  th:title="${wishlistIds.contains(book.bookId) ? 'In Wishlist' : 'Add to Wishlist'}">
+            <span th:text="${wishlistIds.contains(book.bookId) ? '♥' : '♡'}"></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${books.empty}" class="empty-state">
+    <div class="empty-icon">📚</div>
+    <p>No books found. Try a different search.</p>
+    <a th:href="@{/customer/books}" class="btn btn-outline">Browse All</a>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

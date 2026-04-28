@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Add Book — BookVault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<th:block th:replace="~{layout :: navbar}"/>
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 class="page-title">Add New Book</h1>
+  </div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div class="form-card">
+    <form th:action="@{/admin/books/add}" method="post" class="book-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Book ID <small>(e.g. F010, T006, NF007)</small></label>
+          <input type="text" name="bookId" required placeholder="F010"/>
+          <small class="hint">Prefix determines category: F=Fiction, NF=Non-Fiction, A=Academic, T=Technology, C=Children, L=Lifestyle, E=E-Book</small>
+        </div>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" name="title" required placeholder="Book Title"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Author</label>
+          <input type="text" name="author" required placeholder="Author Name"/>
+        </div>
+        <div class="form-group">
+          <label>Price ($)</label>
+          <input type="number" name="price" step="0.01" min="0" required placeholder="9.99"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" name="stock" min="0" required placeholder="50"/>
+        </div>
+        <div class="form-group form-group-check">
+          <label class="check-label">
+            <input type="checkbox" name="ebook"/>
+            <span>This is an E-Book (unlimited stock)</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <a th:href="@{/admin/books}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Add Book</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>
